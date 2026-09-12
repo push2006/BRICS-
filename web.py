@@ -99,6 +99,13 @@ def dashboard():
     critical = _critical_recent(articles, now)
     sources = _sources_with_status()
     streams = load_streams()
+    # Powers the category/country filter dropdowns on the dashboard —
+    # built from whatever's actually present in the current article batch
+    # rather than a hardcoded list, so it never shows an empty option for
+    # a category/country with zero articles, and never misses a country
+    # that config/sources.yaml didn't anticipate.
+    categories = sorted({a.get("category") for a in articles if a.get("category")})
+    countries = sorted({a.get("country") for a in articles if a.get("country")})
     return render_template(
         "dashboard.html",
         articles=articles,
@@ -106,6 +113,8 @@ def dashboard():
         critical_count=len(critical),
         sources=sources,
         streams=streams,
+        categories=categories,
+        countries=countries,
         total=len(articles),
         refreshed=now.strftime("%d %b %Y, %H:%M UTC"),
     )
