@@ -22,7 +22,7 @@ sources:
 
   # ---- China ----
   - {name: "Xinhua",               country: China,        tier: 1, type: rss, url: "http://www.xinhuanet.com/english/rss/worldrss.xml"}
-  - {name: "CCTV",                 country: China,        tier: 2, type: rss, url: "https://english.cctv.com/rss/world.xml", enabled: true}  # WAF/HTML challenge page instead of feed
+  - {name: "CCTV",                 country: China,        tier: 2, type: rss, url: "https://english.cctv.com/rss/world.xml", enabled: false}  # WAF/HTML challenge page instead of feed
   - {name: "MFA China (official)", country: China,        tier: 3, type: scrape, url: "https://www.mfa.gov.cn/eng/"}
 
   # ---- South Africa ----
@@ -31,37 +31,37 @@ sources:
   - {name: "SA Govt News (off.)",  country: SouthAfrica,  tier: 3, type: scrape, url: "https://www.sanews.gov.za/"}
 
   # ---- Brazil ----
-  - {name: "G1/Globo",             country: Brazil,       tier: 2, type: rss, url: "https://g1.globo.com/rss/g1/", enabled: true}  # 403 Forbidden even with browser UA
+  - {name: "G1/Globo",             country: Brazil,       tier: 2, type: rss, url: "https://g1.globo.com/rss/g1/", enabled: false}  # 403 Forbidden even with browser UA
   - {name: "Agencia Brasil",       country: Brazil,       tier: 2, type: rss, url: "https://agenciabrasil.ebc.com.br/rss.xml"}
   - {name: "gov.br (official)",    country: Brazil,       tier: 3, type: scrape, url: "https://www.gov.br/pt-br"}
 
   # ---- Egypt ----
   - {name: "Daily News Egypt",     country: Egypt,        tier: 2, type: rss, url: "https://dailynewsegypt.com/feed/"}
-  - {name: "Ahram Online",         country: Egypt,        tier: 2, type: rss, url: "https://english.ahram.org.eg/UI/Front/RSS.aspx", enabled: true}  # 403 Forbidden even with browser UA
+  - {name: "Ahram Online",         country: Egypt,        tier: 2, type: rss, url: "https://english.ahram.org.eg/UI/Front/RSS.aspx", enabled: false}  # 403 Forbidden even with browser UA
   - {name: "SIS Egypt (official)", country: Egypt,        tier: 3, type: scrape, url: "https://www.sis.gov.eg/en/"}
 
   # ---- Ethiopia ----
   - {name: "Fana Broadcasting",    country: Ethiopia,     tier: 2, type: rss, url: "https://www.fanabc.com/english/feed/"}
-  - {name: "Ethiopian News Agency",country: Ethiopia,     tier: 2, type: rss, url: "https://www.ena.et/en/?feed=rss2", enabled: true}  # WAF/HTML challenge page instead of feed
+  - {name: "Ethiopian News Agency",country: Ethiopia,     tier: 2, type: rss, url: "https://www.ena.et/en/?feed=rss2", enabled: false}  # WAF/HTML challenge page instead of feed
   - {name: "Ethiopia PMO (off.)",  country: Ethiopia,     tier: 3, type: scrape, url: "https://pmo.gov.et/"}
 
   # ---- Indonesia ----
   - {name: "Antara News",          country: Indonesia,    tier: 2, type: rss, url: "https://en.antaranews.com/rss/news.xml"}
-  - {name: "Jakarta Post",         country: Indonesia,    tier: 2, type: rss, url: "https://www.thejakartapost.com/rss/news", enabled: true}  # 404 — RSS retired; site now only publishes sitemap_news.xml (different schema)
+  - {name: "Jakarta Post",         country: Indonesia,    tier: 2, type: rss, url: "https://www.thejakartapost.com/rss/news", enabled: false}  # 404 — RSS retired; site now only publishes sitemap_news.xml (different schema)
   - {name: "Kemlu Indonesia (off.)",country: Indonesia,   tier: 3, type: scrape, url: "https://kemlu.go.id/"}
 
   # ---- Iran ----
   - {name: "IRNA",                 country: Iran,         tier: 1, type: rss, url: "https://en.irna.ir/rss"}
-  - {name: "Press TV",             country: Iran,         tier: 1, type: rss, url: "https://www.presstv.ir/rss.xml", enabled: true}  # consistently times out — network-level block, not header related
+  - {name: "Press TV",             country: Iran,         tier: 1, type: rss, url: "https://www.presstv.ir/rss.xml", enabled: false}  # consistently times out — network-level block, not header related
   - {name: "Iran Press (official)",country: Iran,         tier: 3, type: scrape, url: "https://iranpress.com/"}
 
   # ---- UAE ----
-  - {name: "WAM",                  country: UAE,          tier: 1, type: rss, url: "https://wam.ae/en/rss", enabled: true}  # WAF/HTML challenge page instead of feed
-  - {name: "The National",         country: UAE,          tier: 2, type: rss, url: "https://www.thenationalnews.com/arc/outboundfeeds/rss/", enabled: true}  # 404 — no public RSS endpoint currently published
+  - {name: "WAM",                  country: UAE,          tier: 1, type: rss, url: "https://wam.ae/en/rss", enabled: false}  # WAF/HTML challenge page instead of feed
+  - {name: "The National",         country: UAE,          tier: 2, type: rss, url: "https://www.thenationalnews.com/arc/outboundfeeds/rss/", enabled: false}  # 404 — no public RSS endpoint currently published
   - {name: "UAE MFA (official)",   country: UAE,          tier: 3, type: scrape, url: "https://www.mofa.gov.ae/"}
 
   # ---- Saudi Arabia ----
-  - {name: "Arab News",            country: SaudiArabia,  tier: 2, type: rss, url: "https://www.arabnews.com/rss.xml", enabled: true}  # 403 Forbidden even with browser UA
+  - {name: "Arab News",            country: SaudiArabia,  tier: 2, type: rss, url: "https://www.arabnews.com/rss.xml", enabled: false}  # 403 Forbidden even with browser UA
   - {name: "Saudi Gazette",        country: SaudiArabia,  tier: 2, type: rss, url: "https://saudigazette.com.sa/rssFeed/74"}
   - {name: "SPA (official)",       country: SaudiArabia,  tier: 3, type: scrape, url: "https://www.spa.gov.sa/en"}
 
