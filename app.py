@@ -65,10 +65,12 @@ def cmd_report():
             print(f"[report] emailed {len(ids)} items")
     if C.ENABLE_WHATSAPP:
         if whatsapp_report.send(unsent):
+            store.mark_sent([a["id"] for a in unsent if "id" in a])
             sent_any = True
             print("[report] sent WhatsApp summary")
     if C.ENABLE_TELEGRAM:
         if telegram_report.send(unsent):
+            store.mark_sent([a["id"] for a in unsent if "id" in a])
             sent_any = True
             print("[report] sent Telegram summary")
 
