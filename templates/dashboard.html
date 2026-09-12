@@ -34,7 +34,7 @@
   .ticker-wrap {
     background: var(--red-dim); border-bottom:1px solid var(--red);
     overflow:hidden; position:relative; white-space:nowrap;
-    display:none; /* shown via JS only when there are critical items */
+    display:none;
   }
   .ticker-wrap.has-items { display:block; }
   .ticker-label {
@@ -63,9 +63,7 @@
   }
   header .title-block { min-width:0; }
   header h1 { margin:0; font-size: 24px; font-weight:600; letter-spacing:.01em; }
-  header .dispatch-line {
-    margin: 4px 0 0; font-size: 12.5px; color: var(--dim);
-  }
+  header .dispatch-line { margin: 4px 0 0; font-size: 12.5px; color: var(--dim); }
   header .dispatch-line .mono { color: var(--paper); }
 
   .theme-toggle {
@@ -77,14 +75,8 @@
 
   .wrap { padding: 0 28px 60px; max-width: 1400px; margin: 0 auto; }
 
-  .stats {
-    display:flex; flex-wrap:wrap; border-bottom: 1px solid var(--hair);
-    margin: 0 0 20px;
-  }
-  .stat {
-    padding: 16px 26px 16px 0; margin-right:26px;
-    border-right: 1px solid var(--hair);
-  }
+  .stats { display:flex; flex-wrap:wrap; border-bottom: 1px solid var(--hair); margin: 0 0 20px; }
+  .stat { padding: 16px 26px 16px 0; margin-right:26px; border-right: 1px solid var(--hair); }
   .stat:last-child { border-right:0; }
   .stat b { display:block; font-family:"IBM Plex Mono"; font-size:24px; font-weight:600; color: var(--paper); }
   .stat span { font-size:11.5px; color: var(--dim); }
@@ -94,81 +86,77 @@
   .chart-panel .chart-sub { font-size:11.5px; color: var(--dim); margin:0 0 14px; }
   .bars { display:flex; align-items:flex-end; gap:5px; height:64px; }
   .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; min-width:0; }
-  .bar-col .bar {
-    width:100%; max-width:26px; background: var(--focus); opacity:.85;
-    min-height:2px; transition: height .25s ease;
-  }
+  .bar-col .bar { width:100%; max-width:26px; background: var(--focus); opacity:.85; min-height:2px; transition: height .25s ease; }
   .bar-col .bar.today { background: var(--red); opacity:1; }
   .bar-col .bar-label { font-size:9.5px; color: var(--dim); font-family:"IBM Plex Mono"; white-space:nowrap; }
   .bar-col:hover .bar { opacity:1; }
 
-  .panel {
-    border-top: 2px solid var(--hair); padding-top:16px; margin-bottom:34px;
-  }
+  .panel { border-top: 2px solid var(--hair); padding-top:16px; margin-bottom:34px; }
   .panel.critical { border-top-color: var(--red); }
-  .panel h2 {
-    margin:0 0 16px; font-size:16px; font-weight:600; color:var(--paper);
-  }
+  .panel h2 { margin:0 0 16px; font-size:16px; font-weight:600; color:var(--paper); }
   .panel h2 .hint { font-size:11px; font-weight:400; color:var(--dim); margin-left:8px; }
 
-  /* ---- Live feed section: 20% scrollable list / 80% big player ---- */
+  /* ---- Live feeds: 20% list of small auto-playing feeds / 80% big player ---- */
   .live-feed-layout { display:flex; gap:20px; align-items:flex-start; }
   .feed-list {
-    flex: 0 0 20%; max-width:240px; min-width:160px;
-    max-height:520px; overflow-y:auto; border:1px solid var(--hair);
-    padding:6px;
+    flex: 0 0 20%; max-width:240px; min-width:170px;
+    max-height:560px; overflow-y:auto; border:1px solid var(--hair);
+    padding:6px; display:flex; flex-direction:column; gap:8px;
   }
-  .feed-list-item {
-    display:flex; align-items:center; gap:8px; padding:9px 8px; cursor:pointer;
-    border:1px solid transparent; font-size:12.5px;
+  .feed-mini { position:relative; border:1px solid var(--hair); cursor:pointer; }
+  .feed-mini.active { border-color: var(--focus); }
+  .feed-mini iframe { width:100%; aspect-ratio:16/9; display:block; pointer-events:none; background:#000; }
+  .feed-mini .mini-label {
+    font-size:11px; padding:5px 7px; display:flex; align-items:center; gap:6px;
+    background: var(--panel2); color: var(--paper);
   }
-  .feed-list-item:hover { background: var(--panel2); }
-  .feed-list-item.active { border-color: var(--focus); background: var(--panel2); color: var(--focus); }
-  .feed-list-item .dot {
-    width:7px; height:7px; border-radius:50%; background: var(--green); flex-shrink:0;
+  .feed-mini .mini-label .dot {
+    width:6px; height:6px; border-radius:50%; background: var(--green); flex-shrink:0;
     box-shadow: 0 0 0 0 rgba(94,158,110,.6); animation: pulse 2.4s infinite;
   }
-  @media (prefers-reduced-motion: reduce) { .feed-list-item .dot { animation:none; } }
-  .feed-list-item .name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .feed-list-item .rm {
-    background:transparent; border:1px solid var(--hair); color: var(--dim);
-    width:18px; height:18px; font-size:10px; cursor:pointer; line-height:16px; padding:0; flex-shrink:0;
+  .feed-mini .mini-label .name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .feed-mini .rm {
+    position:absolute; top:4px; right:4px; background: var(--shadow); border:1px solid var(--hair);
+    color: var(--paper); width:18px; height:18px; font-size:10px; cursor:pointer; line-height:16px; padding:0; z-index:2;
   }
-  .feed-list-item .rm:hover { background: var(--red); border-color: var(--red); color:#fff; }
+  .feed-mini .rm:hover { background: var(--red); border-color: var(--red); color:#fff; }
+  .feed-mini .mini-ended {
+    position:absolute; inset:0; background:rgba(0,0,0,.82); color:#fff; display:flex;
+    flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    font-size:10px; padding:6px; gap:4px; z-index:3;
+  }
   .feed-list .empty { padding:10px 4px; }
 
-  .feed-player { flex:1 1 80%; min-width:0; }
-  .feed-player iframe {
-    width:100%; aspect-ratio:16/9; border:1px solid var(--hair); background:#000;
-  }
-  .feed-player .vname {
-    font-size:14px; margin-top:9px; color: var(--paper); font-weight:600;
-    display:flex; align-items:center; gap:8px;
-  }
+  .feed-player { flex:1 1 80%; min-width:0; position:relative; }
+  .feed-player iframe { width:100%; aspect-ratio:16/9; border:1px solid var(--hair); background:#000; }
+  .feed-player .vname { font-size:14px; margin-top:9px; color: var(--paper); font-weight:600; display:flex; align-items:center; gap:8px; }
   .feed-player .vname a { color: var(--dim); font-weight:400; text-decoration:none; font-size:12px; }
   .feed-player .vname a:hover { color: var(--paper); }
   .feed-player .empty { aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; border:1px dashed var(--hair); }
+  .feed-player .hero-ended {
+    position:absolute; top:0; left:0; right:0; aspect-ratio:16/9; background:rgba(0,0,0,.85);
+    color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:10px; padding:20px; z-index:3;
+  }
+  .hero-ended .btn, .mini-ended .btn {
+    background: var(--paper); color: var(--ink); border:0; padding:7px 14px;
+    font-size:12px; font-weight:600; cursor:pointer;
+  }
+  .mini-ended .btn { padding:4px 8px; font-size:10px; }
+  .hero-ended .btn:hover, .mini-ended .btn:hover { background: var(--focus); }
 
   @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(94,158,110,.55); }
     70% { box-shadow: 0 0 0 6px rgba(94,158,110,0); }
     100% { box-shadow: 0 0 0 0 rgba(94,158,110,0); }
   }
+  @media (prefers-reduced-motion: reduce) { .feed-mini .mini-label .dot { animation:none; } }
 
-  .add-stream-form {
-    display:grid; grid-template-columns: 1fr 1fr; gap:8px;
-    margin-top:20px; padding-top:16px; border-top:1px solid var(--hair);
-  }
-  .add-stream-form input {
-    padding:9px 11px; border:1px solid var(--hair); background: var(--panel2);
-    color: var(--paper); font-size:12.5px; font-family:inherit;
-  }
+  .add-stream-form { display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:20px; padding-top:16px; border-top:1px solid var(--hair); }
+  .add-stream-form input { padding:9px 11px; border:1px solid var(--hair); background: var(--panel2); color: var(--paper); font-size:12.5px; font-family:inherit; }
   .add-stream-form input::placeholder { color: var(--dim); }
   .add-stream-form input.link { grid-column: 1 / -1; }
-  .add-stream-form button {
-    grid-column: 1 / -1; background: var(--paper); color: var(--ink);
-    border:0; padding:10px; font-size:13px; font-weight:600; cursor:pointer;
-  }
+  .add-stream-form button { grid-column: 1 / -1; background: var(--paper); color: var(--ink); border:0; padding:10px; font-size:13px; font-weight:600; cursor:pointer; }
   .add-stream-form button:hover { background: var(--focus); color: var(--ink); }
   .stream-msg { grid-column: 1 / -1; font-size:12px; }
   .stream-msg.err { color: var(--red); }
@@ -176,38 +164,45 @@
 
   .filter-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
   .filter-row .search { flex: 2 1 220px; margin-bottom:0; }
-  .filter-row select {
-    flex: 1 1 130px; padding:11px 10px; border:1px solid var(--hair); background: var(--panel2);
-    color: var(--paper); font-size:12.5px; font-family:inherit; cursor:pointer;
-  }
-  .search {
-    width:100%; padding:11px 14px; border:1px solid var(--hair); background: var(--panel2);
-    color: var(--paper); font-size:13px; margin-bottom:16px; font-family:inherit;
-  }
+  .filter-row select { flex: 1 1 130px; padding:11px 10px; border:1px solid var(--hair); background: var(--panel2); color: var(--paper); font-size:12.5px; font-family:inherit; cursor:pointer; }
+  .search { width:100%; padding:11px 14px; border:1px solid var(--hair); background: var(--panel2); color: var(--paper); font-size:13px; margin-bottom:16px; font-family:inherit; }
   .search::placeholder { color: var(--dim); }
 
-  .article { display:flex; gap:14px; padding:11px 0; border-bottom:1px solid var(--hair); }
+  .article { display:flex; gap:14px; padding:11px 0; border-bottom:1px solid var(--hair); position:relative; }
   .article:last-child { border-bottom:0; }
-  .article .ts {
-    flex-shrink:0; width:74px; padding-top:1px; font-size:11px; color: var(--dim);
-  }
+  .article .ts { flex-shrink:0; width:74px; padding-top:1px; font-size:11px; color: var(--dim); }
   .article .body { min-width:0; }
-  .article a { text-decoration:none; font-weight:500; font-size:13.5px; word-break:break-word; }
-  .article a:hover { color: var(--focus); }
+  .article a.headline { text-decoration:none; font-weight:500; font-size:13.5px; word-break:break-word; }
+  .article a.headline:hover { color: var(--focus); }
   .meta { font-size:11.5px; color: var(--dim); margin-top:4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .meta .sep { color: var(--hair); }
 
-  .badge {
-    display:inline-block; font-size:10px; font-family:"IBM Plex Mono";
-    padding:1px 6px; border:1px solid var(--hair); color: var(--dim);
-  }
+  .badge { display:inline-block; font-size:10px; font-family:"IBM Plex Mono"; padding:1px 6px; border:1px solid var(--hair); color: var(--dim); }
   .badge.crit { border-color: var(--red); color: var(--red); }
   .badge.score { border-color: var(--focus); color: var(--focus); }
 
-  .source-row {
-    display:flex; justify-content:space-between; align-items:center; gap:8px;
-    padding:8px 0; border-bottom:1px solid var(--hair); font-size:12.5px; flex-wrap:wrap;
+  /* ---- Hover preview popup for Latest News headlines ---- */
+  .hover-preview {
+    position:fixed; z-index:50; max-width:320px; background: var(--panel);
+    border:1px solid var(--focus); box-shadow:0 6px 18px var(--shadow);
+    padding:12px 14px; font-size:12.5px; pointer-events:none; display:none;
   }
+  .hover-preview.show { display:block; }
+  .hover-preview .hp-title { font-weight:600; font-size:13px; margin-bottom:6px; color: var(--paper); }
+  .hover-preview .hp-meta { color: var(--dim); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
+  .hover-preview .hp-cta { margin-top:8px; color: var(--focus); font-size:11px; }
+
+  /* ---- Sources in use: collapsible, tucked at the very bottom ---- */
+  .sources-toggle {
+    display:flex; align-items:center; gap:8px; width:100%; text-align:left;
+    background: var(--panel2); border:1px solid var(--hair); color: var(--paper);
+    padding:12px 16px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;
+  }
+  .sources-toggle:hover { border-color: var(--focus); color: var(--focus); }
+  .sources-toggle .arrow { transition: transform .15s ease; margin-left:auto; }
+  .sources-panel[open] .sources-toggle .arrow { transform: rotate(180deg); }
+  .sources-body { padding-top:14px; }
+  .source-row { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--hair); font-size:12.5px; flex-wrap:wrap; }
   .source-row:last-child { border-bottom:0; }
   .source-row small { color: var(--dim); }
 
@@ -215,7 +210,8 @@
 
   @media (max-width: 900px) {
     .live-feed-layout { flex-direction:column; }
-    .feed-list { flex-basis:auto; max-width:none; width:100%; max-height:220px; }
+    .feed-list { flex-basis:auto; max-width:none; width:100%; max-height:none; flex-direction:row; overflow-x:auto; overflow-y:visible; }
+    .feed-mini { flex:0 0 160px; }
   }
 
   @media (max-width: 600px) {
@@ -228,6 +224,7 @@
     .filter-row select { flex-basis: 100%; }
     .bars { height:48px; }
     .bar-col .bar-label { display:none; }
+    .hover-preview { display:none !important; } /* no hover on touch */
   }
 </style>
 </head>
@@ -257,9 +254,9 @@
     <div class="bars" id="volumeChart"></div>
   </div>
 
-  <!-- ---- Live feeds: 20% scrollable list, 80% big player ---- -->
+  <!-- ---- Live feeds: all streams auto-play, small on the left, big on the right ---- -->
   <div class="panel">
-    <h2>Live feeds <span class="hint">click a feed on the left to play it here</span></h2>
+    <h2>Live feeds <span class="hint">all feeds play automatically — click one on the left to feature it</span></h2>
     <div class="live-feed-layout">
       <div class="feed-list" id="feedList"></div>
       <div class="feed-player" id="feedPlayer"></div>
@@ -283,7 +280,7 @@
     <div class="article">
       <div class="ts mono">{{ a.collected_at[5:16] }}</div>
       <div class="body">
-        <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>
+        <a class="headline" href="{{ a.url }}" target="_blank" rel="noopener" data-title="{{ a.title }}" data-source="{{ a.source }}" data-country="{{ a.country }}" data-category="{{ a.category }}" data-ts="{{ a.collected_at }}">{{ a.title }}</a>
         <div class="meta"><span>{{ a.source }}</span></div>
       </div>
     </div>
@@ -293,33 +290,9 @@
     </div>
   </div>
 
-  <!-- ---- Sources in use: below critical alerts ---- -->
+  <!-- ---- Latest News (renamed from Latest Wire) ---- -->
   <div class="panel">
-    <h2>Sources in use</h2>
-    {% for s in sources %}
-    <div class="source-row" title="{{ s.last_message or '' }}">
-      <span>{{ s.name }} <small>({{ s.country }})</small></span>
-      <span>
-        <span class="badge">tier {{ s.tier }}</span>
-        {% if s.last_status == 'ok' %}
-          <span class="badge" style="color:#1a7d3c;border-color:#1a7d3c;">● {{ s.last_count }}</span>
-        {% elif s.last_status == 'warning' %}
-          <span class="badge" style="color:#b8860b;border-color:#b8860b;">⚠ {{ s.last_count }}</span>
-        {% elif s.last_status == 'error' %}
-          <span class="badge" style="color:var(--red);border-color:var(--red);">✕ blocked/failed</span>
-        {% elif s.last_status == 'disabled' %}
-          <span class="badge" style="opacity:.5;">disabled</span>
-        {% else %}
-          <span class="badge" style="opacity:.5;">not scanned yet</span>
-        {% endif %}
-      </span>
-    </div>
-    {% endfor %}
-  </div>
-
-  <!-- ---- Latest wire: now full width, with sort control ---- -->
-  <div class="panel">
-    <h2>Latest wire</h2>
+    <h2>Latest news</h2>
     <div class="filter-row">
       <input class="search" id="filterBox" placeholder="Filter by title, source, or country..." onkeyup="filterArticles()">
       <select id="categoryFilter" onchange="filterArticles()">
@@ -345,7 +318,7 @@
       <div class="article" data-search="{{ (a.title ~ ' ' ~ a.source ~ ' ' ~ a.country)|lower }}" data-category="{{ (a.category or '')|lower }}" data-country="{{ (a.country or '')|lower }}" data-ts="{{ a.collected_at or '' }}" data-score="{{ (a.corroborated_by|length) if a.corroborated_by else 1 }}">
         <div class="ts mono">{{ a.collected_at[5:16] }}</div>
         <div class="body">
-          <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>
+          <a class="headline" href="{{ a.url }}" target="_blank" rel="noopener" data-title="{{ a.title }}" data-source="{{ a.source }}" data-country="{{ a.country }}" data-category="{{ a.category }}" data-ts="{{ a.collected_at }}">{{ a.title }}</a>
           <div class="meta">
             <span class="badge{{ ' crit' if a.category=='RISK' else '' }}">{{ a.category }}</span>
             <span>{{ a.source }}</span><span class="sep">/</span><span>{{ a.country }}</span>
@@ -356,19 +329,53 @@
         </div>
       </div>
       {% else %}
-      <div class="empty" id="noArticlesMsg">Nothing collected yet. The next collect cycle will populate this — check the "Sources in use" panel if it's been a while.</div>
+      <div class="empty" id="noArticlesMsg">Nothing collected yet. The next collect cycle will populate this — check "Sources in use" at the bottom of the page if it's been a while.</div>
       {% endfor %}
     </div>
     <div class="empty" id="noMatchesMsg" style="display:none;">No articles match the current filters. Try clearing the search box or switching category/country back to "All".</div>
   </div>
+
+  <!-- ---- Sources in use: hidden by default, pulled open at the very bottom ---- -->
+  <details class="panel sources-panel" id="sourcesPanel">
+    <summary class="sources-toggle">
+      Sources in use ({{ sources|length }}) <span class="arrow">▾</span>
+    </summary>
+    <div class="sources-body">
+      {% for s in sources %}
+      <div class="source-row" title="{{ s.last_message or '' }}">
+        <span>{{ s.name }} <small>({{ s.country }})</small></span>
+        <span>
+          <span class="badge">tier {{ s.tier }}</span>
+          {% if s.last_status == 'ok' %}
+            <span class="badge" style="color:#1a7d3c;border-color:#1a7d3c;">● {{ s.last_count }}</span>
+          {% elif s.last_status == 'warning' %}
+            <span class="badge" style="color:#b8860b;border-color:#b8860b;">⚠ {{ s.last_count }}</span>
+          {% elif s.last_status == 'error' %}
+            <span class="badge" style="color:var(--red);border-color:var(--red);">✕ blocked/failed</span>
+          {% elif s.last_status == 'disabled' %}
+            <span class="badge" style="opacity:.5;">disabled</span>
+          {% else %}
+            <span class="badge" style="opacity:.5;">not scanned yet</span>
+          {% endif %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+  </details>
 </div>
+
+<div class="hover-preview" id="hoverPreview">
+  <div class="hp-title" id="hpTitle"></div>
+  <div class="hp-meta" id="hpMeta"></div>
+  <div class="hp-cta">Click to open the full article ↗</div>
+</div>
+
 <script>
-// IMPORTANT: this script only ever touches #articleList, #criticalList,
-// #volumeChart, #tickerTrack and the stat counters via the 60s refresh loop.
-// The selected live-feed <iframe> in #feedPlayer is NEVER re-rendered or
-// reloaded by refreshNews() — reloading it would restart the live stream.
-// The user manually switching feeds via the list is the only thing that
-// changes the player's iframe src.
+// IMPORTANT: refreshNews() (60s poll) only ever touches #articleList,
+// #criticalList, #volumeChart, #tickerTrack and the stat counters. It
+// never re-renders the live-feed iframes — reloading those would restart
+// the streams. Only selectStream()/submitNewStream()/removeStream() and
+// the ended-feed recovery buttons touch #feedList / #feedPlayer.
 
 function escapeHtml(s){
   return (s || "").replace(/[&<>"']/g, function(c){
@@ -376,9 +383,6 @@ function escapeHtml(s){
   });
 }
 
-// Every dynamic value in these templates — href included — goes through
-// escapeHtml() so a stray quote/tag in feed data can never break out of
-// an attribute or inject markup.
 function articleHtml(a){
   var badgeClass = a.category === 'RISK' ? 'badge crit' : 'badge';
   var search = ((a.title||'') + ' ' + (a.source||'') + ' ' + (a.country||'')).toLowerCase();
@@ -388,14 +392,59 @@ function articleHtml(a){
   return '<div class="article" data-search="' + escapeHtml(search) + '" data-category="' + escapeHtml((a.category||'').toLowerCase()) + '" data-country="' + escapeHtml((a.country||'').toLowerCase()) + '" data-ts="' + escapeHtml(a.collected_at||'') + '" data-score="' + score + '">' +
     '<div class="ts mono">' + escapeHtml(ts) + '</div>' +
     '<div class="body">' +
-    '<a href="' + escapeHtml(a.url) + '" target="_blank" rel="noopener">' + escapeHtml(a.title) + '</a>' +
+    '<a class="headline" href="' + escapeHtml(a.url) + '" target="_blank" rel="noopener" data-title="' + escapeHtml(a.title) + '" data-source="' + escapeHtml(a.source) + '" data-country="' + escapeHtml(a.country) + '" data-category="' + escapeHtml(a.category) + '" data-ts="' + escapeHtml(a.collected_at||'') + '">' + escapeHtml(a.title) + '</a>' +
     '<div class="meta"><span class="' + badgeClass + '">' + escapeHtml(a.category) + '</span>' +
     '<span>' + escapeHtml(a.source) + '</span><span class="sep">/</span><span>' + escapeHtml(a.country) + '</span>' +
     scoreBadge +
     '</div></div></div>';
 }
 
-// ---- Critical ticker: scrolling ribbon at the very top of the page ----
+// ---- Hover preview popup (headline hover -> metadata card near cursor) ----
+// Note: this shows a metadata preview card, not a live embedded iframe of
+// the target page — most news sites send X-Frame-Options/CSP headers that
+// block being framed at all, so an actual embedded preview would just show
+// a blank/broken box for the majority of sources. This gives a fast,
+// reliable preview of what the link is before clicking through instead.
+(function(){
+  var hp = document.getElementById('hoverPreview');
+  var hpTitle = document.getElementById('hpTitle');
+  var hpMeta = document.getElementById('hpMeta');
+  var showTimer = null;
+
+  document.body.addEventListener('mouseover', function(e){
+    var link = e.target.closest('a.headline');
+    if (!link) return;
+    clearTimeout(showTimer);
+    showTimer = setTimeout(function(){
+      hpTitle.textContent = link.dataset.title || link.textContent;
+      var ts = (link.dataset.ts || '').slice(5,16).replace('T', ' ');
+      hpMeta.innerHTML = [
+        link.dataset.category ? escapeHtml(link.dataset.category) : '',
+        link.dataset.source ? escapeHtml(link.dataset.source) : '',
+        link.dataset.country ? escapeHtml(link.dataset.country) : '',
+        ts ? escapeHtml(ts) + ' UTC' : ''
+      ].filter(Boolean).map(function(s){ return '<span>' + s + '</span>'; }).join('<span>/</span>');
+      hp.classList.add('show');
+    }, 150);
+  });
+
+  document.body.addEventListener('mousemove', function(e){
+    if (!hp.classList.contains('show')) return;
+    var x = e.clientX + 16, y = e.clientY + 16;
+    var maxX = window.innerWidth - 340, maxY = window.innerHeight - 140;
+    hp.style.left = Math.min(x, Math.max(0, maxX)) + 'px';
+    hp.style.top = Math.min(y, Math.max(0, maxY)) + 'px';
+  });
+
+  document.body.addEventListener('mouseout', function(e){
+    var link = e.target.closest('a.headline');
+    if (!link) return;
+    clearTimeout(showTimer);
+    hp.classList.remove('show');
+  });
+})();
+
+// ---- Critical ticker ----
 function tickerItemHtml(a){
   return '<a href="' + escapeHtml(a.url) + '" target="_blank" rel="noopener">🚨 ' +
     escapeHtml(a.title) + ' <span class="src">— ' + escapeHtml(a.source) + '</span></a>';
@@ -403,30 +452,18 @@ function tickerItemHtml(a){
 function renderTicker(critical){
   var wrap = document.getElementById('tickerWrap');
   var track = document.getElementById('tickerTrack');
-  if (!critical || !critical.length){
-    wrap.classList.remove('has-items');
-    track.innerHTML = '';
-    return;
-  }
+  if (!critical || !critical.length){ wrap.classList.remove('has-items'); track.innerHTML = ''; return; }
   wrap.classList.add('has-items');
-  // Duplicate the items once so the marquee loop has no visible gap.
   var html = critical.map(tickerItemHtml).join('');
   track.innerHTML = html + html;
 }
 
-// ---- Volume chart: buckets whatever article list we currently have by
-// day (last 14 days). Recomputed on every refresh so it stays live
-// without a separate endpoint. ----
 function renderVolumeChart(articles){
-  var days = [];
-  var counts = {};
-  var now = new Date();
+  var days = [], counts = {}, now = new Date();
   for (var i = 13; i >= 0; i--){
-    var d = new Date(now);
-    d.setDate(d.getDate() - i);
+    var d = new Date(now); d.setDate(d.getDate() - i);
     var key = d.toISOString().slice(0,10);
-    days.push(key);
-    counts[key] = 0;
+    days.push(key); counts[key] = 0;
   }
   articles.forEach(function(a){
     var key = (a.collected_at || '').slice(0,10);
@@ -450,7 +487,7 @@ function refreshNews(){
     var list = document.getElementById('articleList');
     list.innerHTML = data.articles.length
       ? data.articles.map(articleHtml).join('')
-      : '<div class="empty" id="noArticlesMsg">Nothing collected yet. The next collect cycle will populate this — check the "Sources in use" panel if it\'s been a while.</div>';
+      : '<div class="empty" id="noArticlesMsg">Nothing collected yet. The next collect cycle will populate this — check "Sources in use" at the bottom of the page if it\'s been a while.</div>';
 
     var crit = document.getElementById('criticalList');
     crit.innerHTML = data.critical.length
@@ -464,15 +501,11 @@ function refreshNews(){
 
     renderVolumeChart(data.articles);
     renderTicker(data.critical);
-    filterArticles(); // re-apply any active search/category/country filter
-    sortArticles();   // re-apply the active sort order
+    filterArticles();
+    sortArticles();
   }).catch(function(e){ console.error('refresh failed', e); });
 }
 
-// BUG FIX (kept from earlier version): previously only matched the free-text
-// search box against data-search, ignoring category/country dropdowns
-// entirely. Now all three conditions must pass for a row to show, and an
-// explicit "no matches" message appears instead of a silently empty list.
 function filterArticles(){
   var q = document.getElementById('filterBox').value.toLowerCase();
   var cat = document.getElementById('categoryFilter').value;
@@ -491,41 +524,29 @@ function filterArticles(){
   if (noMatches) noMatches.style.display = (rows.length > 0 && visibleCount === 0) ? '' : 'none';
 }
 
-// ---- Sort control for Latest Wire: latest first (default, by collected_at),
-// country A-Z (all countries included), or highest "score" first (score =
-// number of sources corroborating the same story, from dedupe.py). ----
 function sortArticles(){
   var mode = document.getElementById('sortOrder').value;
   var list = document.getElementById('articleList');
   var rows = Array.prototype.slice.call(list.querySelectorAll('.article'));
   if (!rows.length) return;
-
   rows.sort(function(a, b){
     if (mode === 'country'){
-      var ca = a.dataset.country || '';
-      var cb = b.dataset.country || '';
+      var ca = a.dataset.country || '', cb = b.dataset.country || '';
       if (ca !== cb) return ca < cb ? -1 : 1;
-      return (b.dataset.ts || '').localeCompare(a.dataset.ts || ''); // latest first within a country
+      return (b.dataset.ts || '').localeCompare(a.dataset.ts || '');
     }
     if (mode === 'score'){
-      var sa = parseInt(a.dataset.score, 10) || 0;
-      var sb = parseInt(b.dataset.score, 10) || 0;
+      var sa = parseInt(a.dataset.score, 10) || 0, sb = parseInt(b.dataset.score, 10) || 0;
       if (sa !== sb) return sb - sa;
       return (b.dataset.ts || '').localeCompare(a.dataset.ts || '');
     }
-    // default: latest first
     return (b.dataset.ts || '').localeCompare(a.dataset.ts || '');
   });
-
   rows.forEach(function(el){ list.appendChild(el); });
 }
 
-// Poll for new news every 60s. Video iframes above are untouched by this.
 setInterval(refreshNews, 60000);
 
-// ---- Theme toggle: persisted in localStorage, defaults to dark (the
-// site's original/native look) so returning visitors and first-time
-// visitors see the same thing unless they've explicitly chosen light. ----
 (function(){
   var saved = localStorage.getItem('brics_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
@@ -540,8 +561,6 @@ function toggleTheme(){
   document.getElementById('themeToggle').textContent = next === 'dark' ? '☾ Dark' : '☀ Light';
 }
 
-// ---- Live stream list + big player ----
-// Remembers the dashboard key in this browser so it doesn't need retyping.
 (function(){
   var saved = localStorage.getItem('brics_dashboard_key');
   if (saved) document.getElementById('dashboardKey').value = saved;
@@ -553,31 +572,63 @@ function streamMsg(text, isError){
   el.className = 'stream-msg ' + (isError ? 'err' : 'ok');
 }
 
+// ---- Live streams: all auto-play (muted, required by browser autoplay
+// policy), mini copies on the left, one big "hero" copy on the right.
+// Ended-stream detection uses YouTube's postMessage bridge (enablejsapi=1
+// + a "listening" handshake) rather than loading the full external
+// IFrame Player API script, so state-change events (state 0 = ended)
+// arrive without an extra script dependency. ----
 var streamsState = {{ streams|tojson }};
 var activeStreamName = streamsState.length ? streamsState[0].name : null;
+var endedStreams = {}; // name -> true, once we've detected/alerted on it
 
-function feedListItemHtml(s){
+function ytEmbedUrl(baseUrl, opts){
+  opts = opts || {};
+  var sep = baseUrl.indexOf('?') > -1 ? '&' : '?';
+  var params = 'autoplay=1&mute=' + (opts.muted === false ? 0 : 1) +
+    '&playsinline=1&enablejsapi=1&rel=0&modestbranding=1&origin=' + encodeURIComponent(window.location.origin);
+  return baseUrl + sep + params;
+}
+
+function miniIframeId(name){ return 'mini-' + name.replace(/[^a-zA-Z0-9]/g, '_'); }
+
+function feedMiniHtml(s){
   var activeClass = (s.name === activeStreamName) ? ' active' : '';
-  return '<div class="feed-list-item' + activeClass + '" data-select-stream="' + escapeHtml(s.name) + '">' +
-    '<span class="dot"></span>' +
-    '<span class="name">' + escapeHtml(s.name) + (s.country ? ' <small style="color:var(--dim)">(' + escapeHtml(s.country) + ')</small>' : '') + '</span>' +
+  var ended = endedStreams[s.name];
+  return '<div class="feed-mini' + activeClass + '" data-select-stream="' + escapeHtml(s.name) + '">' +
     '<button class="rm" title="Remove stream" data-remove-stream="' + escapeHtml(s.name) + '">✕</button>' +
+    (ended
+      ? '<div class="mini-ended">Feed ended<br><button class="btn" data-retry-stream="' + escapeHtml(s.name) + '">Retry</button></div>'
+      : '') +
+    '<iframe id="' + miniIframeId(s.name) + '" data-stream-name="' + escapeHtml(s.name) + '" src="' + escapeHtml(ytEmbedUrl(s.embed_url, {muted:true})) + '" allow="autoplay; encrypted-media" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>' +
+    '<div class="mini-label"><span class="dot"></span><span class="name">' + escapeHtml(s.name) + '</span></div>' +
     '</div>';
 }
 
 function playerHtml(s){
   if (!s) {
-    return '<div class="empty">No live streams yet — add one below, then pick it from the list on the left.</div>';
+    return '<div class="empty">No live streams yet — add one below, and it\'ll start playing automatically.</div>';
   }
-  return '<iframe src="' + escapeHtml(s.embed_url) + '" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>' +
+  var ended = endedStreams[s.name];
+  return (ended ? heroEndedHtml(s) : '') +
+    '<iframe id="hero-frame" data-stream-name="' + escapeHtml(s.name) + '" src="' + escapeHtml(ytEmbedUrl(s.embed_url, {muted:true})) + '" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>' +
     '<div class="vname">' + escapeHtml(s.name) +
     ' <a href="' + escapeHtml(s.watch_url) + '" target="_blank">↗ open on YouTube</a></div>';
+}
+
+function heroEndedHtml(s){
+  return '<div class="hero-ended">' +
+    '<div>🔴 "' + escapeHtml(s.name) + '" has ended.</div>' +
+    '<div style="display:flex;gap:10px;">' +
+    '<button class="btn" data-retry-stream="' + escapeHtml(s.name) + '">Try reloading it</button>' +
+    '<button class="btn" onclick="document.getElementById(\'newStreamName\').scrollIntoView({behavior:\'smooth\',block:\'center\'});document.getElementById(\'newStreamName\').focus();">Add a new feed</button>' +
+    '</div></div>';
 }
 
 function renderFeedList(){
   var listEl = document.getElementById('feedList');
   listEl.innerHTML = streamsState.length
-    ? streamsState.map(feedListItemHtml).join('')
+    ? streamsState.map(feedMiniHtml).join('')
     : '<div class="empty">No streams yet.</div>';
 }
 
@@ -592,6 +643,66 @@ function selectStream(name){
   renderFeedList();
   renderPlayer();
 }
+
+function retryStream(name){
+  delete endedStreams[name];
+  if (name === activeStreamName) { renderPlayer(); } else { renderFeedList(); }
+}
+window.retryStream = retryStream;
+
+// Delegated click handler for select / remove / retry — works for
+// dynamically-added elements too, and never embeds a name inside an
+// inline onclick="" attribute (breaks on names containing a quote).
+document.addEventListener('click', function(e){
+  var retry = e.target.closest('[data-retry-stream]');
+  if (retry){ retryStream(retry.getAttribute('data-retry-stream')); return; }
+  var rm = e.target.closest('[data-remove-stream]');
+  if (rm){ removeStream(rm.getAttribute('data-remove-stream')); return; }
+  var item = e.target.closest('[data-select-stream]');
+  if (item){ selectStream(item.getAttribute('data-select-stream')); }
+});
+
+// ---- Ended-feed detection via YouTube's lightweight postMessage bridge ----
+// Each embedded player (mini + hero) is sent a "listening" handshake once
+// loaded; YouTube then pushes player-state updates back. playerState 0
+// means the video/broadcast ended. This needs no external script beyond
+// the iframe itself.
+function attachListener(iframeEl){
+  if (!iframeEl || iframeEl._listened) return;
+  iframeEl._listened = true;
+  iframeEl.addEventListener('load', function(){
+    try {
+      iframeEl.contentWindow.postMessage(JSON.stringify({event:'listening', id: iframeEl.id}), '*');
+    } catch(e) {}
+  });
+}
+
+window.addEventListener('message', function(e){
+  var data;
+  try { data = JSON.parse(e.data); } catch(err) { return; }
+  if (!data || data.event !== 'infoDelivery' || !data.info) return;
+  if (typeof data.info.playerState === 'undefined') return;
+  if (data.info.playerState !== 0) return; // 0 = ended
+
+  // Figure out which iframe posted this by matching its source window.
+  var frames = document.querySelectorAll('iframe[data-stream-name]');
+  for (var i = 0; i < frames.length; i++){
+    if (frames[i].contentWindow === e.source){
+      var name = frames[i].dataset.streamName;
+      if (!endedStreams[name]){
+        endedStreams[name] = true;
+        renderFeedList();
+        renderPlayer();
+      }
+      break;
+    }
+  }
+});
+
+// Re-attach listeners whenever the feed list / player DOM is rebuilt.
+var _origRenderFeedList = renderFeedList, _origRenderPlayer = renderPlayer;
+renderFeedList = function(){ _origRenderFeedList(); document.querySelectorAll('#feedList iframe').forEach(attachListener); };
+renderPlayer = function(){ _origRenderPlayer(); attachListener(document.getElementById('hero-frame')); };
 
 function submitNewStream(){
   var name = document.getElementById('newStreamName').value.trim();
@@ -610,7 +721,7 @@ function submitNewStream(){
   }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
     .then(function(res){
       if (!res.ok){ streamMsg(res.data.error || 'Could not add stream.', true); return; }
-      streamMsg('Added "' + res.data.stream.name + '". No reload needed — it\'s saved.', false);
+      streamMsg('Added "' + res.data.stream.name + '". Playing automatically now.', false);
       streamsState.push(res.data.stream);
       if (!activeStreamName) activeStreamName = res.data.stream.name;
       renderFeedList();
@@ -629,6 +740,7 @@ function removeStream(name){
     .then(function(res){
       if (!res.ok){ streamMsg(res.data.error || 'Could not remove stream.', true); return; }
       streamsState = streamsState.filter(function(s){ return s.name !== name; });
+      delete endedStreams[name];
       if (activeStreamName === name){
         activeStreamName = streamsState.length ? streamsState[0].name : null;
       }
@@ -638,18 +750,7 @@ function removeStream(name){
     }).catch(function(){ streamMsg('Network error removing stream.', true); });
 }
 
-// Delegated click handler — works for both the list items and remove
-// buttons, whether rendered on page load or added dynamically afterward,
-// and avoids ever embedding a stream name inside an inline onclick=""
-// attribute (which breaks if the name contains a quote character).
-document.getElementById('feedList').addEventListener('click', function(e){
-  var rm = e.target.closest('[data-remove-stream]');
-  if (rm){ removeStream(rm.getAttribute('data-remove-stream')); return; }
-  var item = e.target.closest('[data-select-stream]');
-  if (item){ selectStream(item.getAttribute('data-select-stream')); }
-});
-
-// Initial render.
+// Initial render — all feeds start playing (muted) automatically here.
 renderFeedList();
 renderPlayer();
 renderVolumeChart({{ articles|tojson }});
