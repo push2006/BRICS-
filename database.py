@@ -101,7 +101,12 @@ class MongoStore:
             return False  # duplicate key = already have it
 
     def unsent(self):
-        return list(self.col.find({"emailed": False}).sort("collected_at", -1))
+        # Excludes Mongo's own "_id" (an ObjectId) — this app's own "id"
+        # field (sha256 of the URL) is the real key everywhere else, and
+        # ObjectId isn't JSON-serializable, so leaving it in breaks
+        # web.py's /api/articles (Flask's jsonify raises on it) the moment
+        # STORAGE_BACKEND=mongodb is turned on.
+        return list(self.col.find({"emailed": False}, {"_id": 0}).sort("collected_at", -1))
 
     def mark_sent(self, ids):
         self.col.update_many({"id": {"$in": ids}}, {"$set": {"emailed": True}})
@@ -117,7 +122,8 @@ class MongoStore:
         return new_items
 
     def recent(self, limit=50):
-        return list(self.col.find().sort("collected_at", -1).limit(limit))
+        # See unsent() above re: dropping "_id".
+        return list(self.col.find({}, {"_id": 0}).sort("collected_at", -1).limit(limit))
 
 
 _store_instance = None
