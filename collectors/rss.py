@@ -3,6 +3,7 @@ import re
 import socket
 import threading
 import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import yaml
 import requests
 import feedparser
@@ -108,56 +109,98 @@ def _fetch_feed(url):
         return feedparser.parse(url, agent=_USER_AGENT)
 
 
+
+# Fetching sources one at a time meant a single slow/dead feed (a full
+# _FETCH_TIMEOUT_SECONDS read timeout) delayed every source behind it —
+# with ~15 sources that could push one collect cycle well past gunicorn's
+# worker timeout (see web.py's /trigger-collect), which showed up as
+# repeated "WORKER TIMEOUT" / SIGKILL loops in production even though each
+# individual fetch was behaving as designed. Fetching is I/O-bound, so a
+# small thread pool lets slow sources overlap instead of stacking up —
+# total wall-clock time becomes roughly the slowest single source instead
+# of the sum of all of them.
+_MAX_CONCURRENT_FETCHES = 8
+
+
+def _process_feed(src, feed):
+    """Turns a parsed feed into article dicts and records its status.
+    Shared by the (now parallel) fetch path so the status/print behavior
+    is identical to before."""
+    if feed.bozo and not feed.entries:
+        # Malformed/blocked response with zero usable entries — the
+        # single biggest silent cause of "no new items ever" for a
+        # given source. Surfaced here instead of swallowed.
+        msg = str(feed.get("bozo_exception", "malformed feed"))
+        print(f"[rss] {src['name']}: 0 entries, feed error: {msg}")
+        _record_status(src["name"], "error", 0, msg)
+        return []
+    elif feed.bozo:
+        # Entries came through despite a parse warning — usually
+        # harmless (minor XML quirk), but worth a heads-up once.
+        print(f"[rss] {src['name']}: {len(feed.entries)} entries (feed had a parse warning, used anyway)")
+        _record_status(src["name"], "warning", len(feed.entries), "parse warning, used anyway")
+    else:
+        print(f"[rss] {src['name']}: {len(feed.entries)} entries")
+        _record_status(src["name"], "ok", len(feed.entries))
+
+    out = []
+    for entry in feed.entries[:30]:
+        out.append({
+            "title": _clean(entry.get("title", "")),
+            "url": entry.get("link", "").strip(),
+            "source": src["name"],
+            "country": src.get("country", ""),
+            "summary": _clean(entry.get("summary", ""))[:500],
+            "published": entry.get("published", entry.get("updated", "")),
+        })
+    return out
+
+
 def fetch_all(tiers=(1, 2)):
     """Returns a flat list of article dicts from every RSS source in `tiers`.
     Prints a per-source item count so a dead/blocked feed is visible instead
-    of silently contributing 0 items and looking like "no new content"."""
+    of silently contributing 0 items and looking like "no new content".
+
+    Fetches sources concurrently (see _MAX_CONCURRENT_FETCHES) so one slow
+    source doesn't hold up every source behind it."""
     articles = []
+    to_fetch = []
+    for src in load_sources():
+        if not src.get("enabled", True):
+            # Source flagged off in sources.yaml (dead feed, or
+            # confirmed bot-blocked beyond what headers/cleanup fix) —
+            # skip without noise instead of retrying every cycle.
+            _record_status(src["name"], "disabled", 0, "disabled in sources.yaml")
+            continue
+        if src.get("type") != "rss" or src.get("tier") not in tiers:
+            continue
+        to_fetch.append(src)
+
+    if not to_fetch:
+        return articles
+
     old_timeout = socket.getdefaulttimeout()
     socket.setdefaulttimeout(_FETCH_TIMEOUT_SECONDS)
     try:
-        for src in load_sources():
-            if not src.get("enabled", True):
-                # Source flagged off in sources.yaml (dead feed, or
-                # confirmed bot-blocked beyond what headers/cleanup fix) —
-                # skip without noise instead of retrying every cycle.
-                _record_status(src["name"], "disabled", 0, "disabled in sources.yaml")
-                continue
-            if src.get("type") != "rss" or src.get("tier") not in tiers:
-                continue
-            try:
-                feed = _fetch_feed(src["url"])
-            except Exception as e:
-                print(f"[rss] {src['name']}: FAILED ({e})")
-                _record_status(src["name"], "error", 0, str(e))
-                continue
+        with ThreadPoolExecutor(max_workers=min(_MAX_CONCURRENT_FETCHES, len(to_fetch))) as pool:
+            future_to_src = {pool.submit(_fetch_feed, src["url"]): src for src in to_fetch}
+            # Collect in submission order (not completion order) so console
+            # output/status stays stable and easy to read run-to-run.
+            results = {}
+            for future in as_completed(future_to_src):
+                src = future_to_src[future]
+                try:
+                    results[src["name"]] = future.result()
+                except Exception as e:
+                    print(f"[rss] {src['name']}: FAILED ({e})")
+                    _record_status(src["name"], "error", 0, str(e))
+                    results[src["name"]] = None
 
-            if feed.bozo and not feed.entries:
-                # Malformed/blocked response with zero usable entries — the
-                # single biggest silent cause of "no new items ever" for a
-                # given source. Surfaced here instead of swallowed.
-                msg = str(feed.get("bozo_exception", "malformed feed"))
-                print(f"[rss] {src['name']}: 0 entries, feed error: {msg}")
-                _record_status(src["name"], "error", 0, msg)
-                continue
-            elif feed.bozo:
-                # Entries came through despite a parse warning — usually
-                # harmless (minor XML quirk), but worth a heads-up once.
-                print(f"[rss] {src['name']}: {len(feed.entries)} entries (feed had a parse warning, used anyway)")
-                _record_status(src["name"], "warning", len(feed.entries), "parse warning, used anyway")
-            else:
-                print(f"[rss] {src['name']}: {len(feed.entries)} entries")
-                _record_status(src["name"], "ok", len(feed.entries))
-
-            for entry in feed.entries[:30]:
-                articles.append({
-                    "title": _clean(entry.get("title", "")),
-                    "url": entry.get("link", "").strip(),
-                    "source": src["name"],
-                    "country": src.get("country", ""),
-                    "summary": _clean(entry.get("summary", ""))[:500],
-                    "published": entry.get("published", entry.get("updated", "")),
-                })
+            for src in to_fetch:
+                feed = results.get(src["name"])
+                if feed is None:
+                    continue
+                articles.extend(_process_feed(src, feed))
     finally:
         socket.setdefaulttimeout(old_timeout)
     return articles
