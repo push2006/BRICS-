@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 <head>
 <meta charset="utf-8">
 <title>BRICS Live Monitor</title>
@@ -8,16 +8,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
+  html[data-theme="dark"] {
     --ink:#15140F; --panel:#1D1B14; --panel2:#221F17; --paper:#EDEAE0;
-    --hair:#3B3830; --dim:#93907E; --red:#B8442E; --red-dim:#5C2A20;
-    --green:#5E9E6E; --focus:#D9C98A;
+    --hair:#3B3830; --dim:#93907E; --red:#C4553B; --red-dim:#5C2A20;
+    --green:#5E9E6E; --focus:#D9C98A; --shadow: rgba(0,0,0,.35);
+  }
+  html[data-theme="light"] {
+    --ink:#EDEAE0; --panel:#FFFFFF; --panel2:#F6F3E9; --paper:#1B1912;
+    --hair:#DAD4C2; --dim:#7C7867; --red:#A6392A; --red-dim:#F1DAD3;
+    --green:#3D7A50; --focus:#8A6D1E; --shadow: rgba(60,55,35,.12);
   }
   * { box-sizing: border-box; }
   body {
     margin:0; background: var(--ink); color: var(--paper);
     font-family: "Inter", -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     font-size: 14px; line-height: 1.5;
+    transition: background .15s ease, color .15s ease;
   }
   h1, h2 { font-family: "Zilla Slab", Georgia, serif; }
   .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
@@ -29,17 +35,25 @@
     padding: 22px 28px 18px;
     display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
   }
+  header .title-block { min-width:0; }
   header h1 { margin:0; font-size: 24px; font-weight:600; letter-spacing:.01em; }
   header .dispatch-line {
     margin: 4px 0 0; font-size: 12.5px; color: var(--dim);
   }
   header .dispatch-line .mono { color: var(--paper); }
 
+  .theme-toggle {
+    background: transparent; border:1px solid var(--hair); color: var(--paper);
+    padding:7px 12px; font-size:12px; font-family:"IBM Plex Mono"; cursor:pointer;
+    flex-shrink:0; white-space:nowrap;
+  }
+  .theme-toggle:hover { border-color: var(--focus); color: var(--focus); }
+
   .wrap { padding: 0 28px 60px; max-width: 1400px; margin: 0 auto; }
 
   .stats {
     display:flex; flex-wrap:wrap; border-bottom: 1px solid var(--hair);
-    margin: 0 0 28px;
+    margin: 0 0 20px;
   }
   .stat {
     padding: 16px 26px 16px 0; margin-right:26px;
@@ -48,6 +62,19 @@
   .stat:last-child { border-right:0; }
   .stat b { display:block; font-family:"IBM Plex Mono"; font-size:24px; font-weight:600; color: var(--paper); }
   .stat span { font-size:11.5px; color: var(--dim); }
+
+  .chart-panel { padding: 16px 0 20px; border-bottom: 1px solid var(--hair); margin-bottom: 28px; }
+  .chart-panel h2 { margin:0 0 4px; font-size:14px; font-weight:600; }
+  .chart-panel .chart-sub { font-size:11.5px; color: var(--dim); margin:0 0 14px; }
+  .bars { display:flex; align-items:flex-end; gap:5px; height:64px; }
+  .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; min-width:0; }
+  .bar-col .bar {
+    width:100%; max-width:26px; background: var(--focus); opacity:.85;
+    min-height:2px; transition: height .25s ease;
+  }
+  .bar-col .bar.today { background: var(--red); opacity:1; }
+  .bar-col .bar-label { font-size:9.5px; color: var(--dim); font-family:"IBM Plex Mono"; white-space:nowrap; }
+  .bar-col:hover .bar { opacity:1; }
 
   .grid { display:grid; grid-template-columns: 2fr 1fr; gap:28px; align-items:start; }
   @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
@@ -81,11 +108,11 @@
   .video-box .vname a { color: var(--dim); font-weight:400; text-decoration:none; }
   .video-box .vname a:hover { color: var(--paper); }
   .video-box .rm {
-    position:absolute; top:6px; right:6px; background: rgba(21,20,15,.75);
+    position:absolute; top:6px; right:6px; background: var(--shadow);
     color: var(--paper); border:1px solid var(--hair); width:22px; height:22px;
     text-align:center; font-size:12px; cursor:pointer; padding:0; line-height:20px;
   }
-  .video-box .rm:hover { background: var(--red); border-color: var(--red); }
+  .video-box .rm:hover { background: var(--red); border-color: var(--red); color:#fff; }
 
   .add-stream-form {
     display:grid; grid-template-columns: 1fr 1fr; gap:8px;
@@ -101,16 +128,29 @@
     grid-column: 1 / -1; background: var(--paper); color: var(--ink);
     border:0; padding:10px; font-size:13px; font-weight:600; cursor:pointer;
   }
-  .add-stream-form button:hover { background: var(--focus); }
+  .add-stream-form button:hover { background: var(--focus); color: var(--ink); }
   .stream-msg { grid-column: 1 / -1; font-size:12px; }
   .stream-msg.err { color: var(--red); }
   .stream-msg.ok { color: var(--green); }
 
+  .filter-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .filter-row .search { flex: 2 1 220px; margin-bottom:0; }
+  .filter-row select {
+    flex: 1 1 130px; padding:11px 10px; border:1px solid var(--hair); background: var(--panel2);
+    color: var(--paper); font-size:12.5px; font-family:inherit; cursor:pointer;
+  }
   .search {
     width:100%; padding:11px 14px; border:1px solid var(--hair); background: var(--panel2);
     color: var(--paper); font-size:13px; margin-bottom:16px; font-family:inherit;
   }
   .search::placeholder { color: var(--dim); }
+
+  .category-legend { display:flex; flex-wrap:wrap; gap:6px; margin: -6px 0 16px; }
+  .category-legend .chip {
+    font-size:10.5px; font-family:"IBM Plex Mono"; padding:2px 8px;
+    border:1px solid var(--hair); color:var(--dim); cursor:pointer; user-select:none;
+  }
+  .category-legend .chip.active { border-color: var(--focus); color: var(--focus); }
 
   .article { display:flex; gap:14px; padding:11px 0; border-bottom:1px solid var(--hair); }
   .article:last-child { border-bottom:0; }
@@ -118,7 +158,7 @@
     flex-shrink:0; width:74px; padding-top:1px; font-size:11px; color: var(--dim);
   }
   .article .body { min-width:0; }
-  .article a { text-decoration:none; font-weight:500; font-size:13.5px; }
+  .article a { text-decoration:none; font-weight:500; font-size:13.5px; word-break:break-word; }
   .article a:hover { color: var(--focus); }
   .meta { font-size:11.5px; color: var(--dim); margin-top:4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .meta .sep { color: var(--hair); }
@@ -130,19 +170,34 @@
   .badge.crit { border-color: var(--red); color: var(--red); }
 
   .source-row {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:8px 0; border-bottom:1px solid var(--hair); font-size:12.5px;
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    padding:8px 0; border-bottom:1px solid var(--hair); font-size:12.5px; flex-wrap:wrap;
   }
   .source-row:last-child { border-bottom:0; }
   .source-row small { color: var(--dim); }
 
   .empty { color: var(--dim); font-size:12.5px; padding:10px 0; }
+
+  @media (max-width: 600px) {
+    header { padding: 16px 16px 14px; }
+    header h1 { font-size:20px; }
+    .wrap { padding: 0 16px 44px; }
+    .stat { padding: 12px 16px 12px 0; margin-right:16px; }
+    .stat b { font-size:19px; }
+    .add-stream-form { grid-template-columns: 1fr; }
+    .filter-row select { flex-basis: 100%; }
+    .bars { height:48px; }
+    .bar-col .bar-label { display:none; }
+  }
 </style>
 </head>
 <body>
 <header>
-  <h1>BRICS Live Monitor</h1>
-  <p class="dispatch-line">Last refreshed <span id="refreshedTime" class="mono">{{ refreshed }}</span> — <span id="totalCount" class="mono">{{ total }}</span> articles tracked — live feeds embedded below, never reload</p>
+  <div class="title-block">
+    <h1>BRICS Live Monitor</h1>
+    <p class="dispatch-line">Last refreshed <span id="refreshedTime" class="mono">{{ refreshed }}</span> — <span id="totalCount" class="mono">{{ total }}</span> articles tracked — live feeds embedded below, never reload</p>
+  </div>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☾ Dark</button>
 </header>
 <div class="wrap">
   <div class="stats">
@@ -150,6 +205,12 @@
     <div class="stat"><b id="statCritical">{{ critical_count }}</b><span>Critical (24h)</span></div>
     <div class="stat"><b>{{ streams|length }}</b><span>Live streams</span></div>
     <div class="stat"><b>{{ sources|length }}</b><span>Sources tracked</span></div>
+  </div>
+
+  <div class="chart-panel">
+    <h2>Volume, last 14 days</h2>
+    <p class="chart-sub">Articles collected per day — bars scale to the busiest day in this window.</p>
+    <div class="bars" id="volumeChart"></div>
   </div>
 
   <div class="grid">
@@ -180,13 +241,27 @@
 
       <div class="panel">
         <h2>Latest wire</h2>
-        <input class="search" id="filterBox" placeholder="Filter by title, source, or country..." onkeyup="filterArticles()">
+        <div class="filter-row">
+          <input class="search" id="filterBox" placeholder="Filter by title, source, or country..." onkeyup="filterArticles()">
+          <select id="categoryFilter" onchange="filterArticles()">
+            <option value="">All categories</option>
+            {% for cat in categories %}
+            <option value="{{ cat|lower }}">{{ cat }}</option>
+            {% endfor %}
+          </select>
+          <select id="countryFilter" onchange="filterArticles()">
+            <option value="">All countries</option>
+            {% for c in countries %}
+            <option value="{{ c|lower }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
         <div id="articleList">
           {% for a in articles %}
-          <div class="article" data-search="{{ (a.title ~ ' ' ~ a.source ~ ' ' ~ a.country)|lower }}">
+          <div class="article" data-search="{{ (a.title ~ ' ' ~ a.source ~ ' ' ~ a.country)|lower }}" data-category="{{ (a.category or '')|lower }}" data-country="{{ (a.country or '')|lower }}">
             <div class="ts mono">{{ a.collected_at[5:16] }}</div>
             <div class="body">
-              <a href="{{ a.url }}" target="_blank">{{ a.title }}</a>
+              <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>
               <div class="meta">
                 <span class="badge{{ ' crit' if a.category=='RISK' else '' }}">{{ a.category }}</span>
                 <span>{{ a.source }}</span><span class="sep">/</span><span>{{ a.country }}</span>
@@ -194,9 +269,10 @@
             </div>
           </div>
           {% else %}
-          <div class="empty">No BRICS-relevant articles yet — the collector runs on startup and every few minutes.</div>
+          <div class="empty" id="noArticlesMsg">Nothing collected yet. The next collect cycle will populate this — check the "Sources in use" panel if it's been a while.</div>
           {% endfor %}
         </div>
+        <div class="empty" id="noMatchesMsg" style="display:none;">No articles match the current filters. Try clearing the search box or switching category/country back to "All".</div>
       </div>
     </div>
 
@@ -208,7 +284,7 @@
         <div class="article">
           <div class="ts mono">{{ a.collected_at[5:16] }}</div>
           <div class="body">
-            <a href="{{ a.url }}" target="_blank">{{ a.title }}</a>
+            <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>
             <div class="meta"><span>{{ a.source }}</span></div>
           </div>
         </div>
@@ -245,9 +321,10 @@
 </div>
 <script>
 // IMPORTANT: this script only ever touches #articleList, #criticalList,
-// and the stat counters. The <video-grid> / <iframe> live feeds above are
-// rendered once on page load and are NEVER re-rendered or reloaded by
-// this refresh loop — reloading an iframe restarts the live stream.
+// #volumeChart and the stat counters. The <video-grid> / <iframe> live
+// feeds above are rendered once on page load and are NEVER re-rendered
+// or reloaded by this refresh loop — reloading an iframe restarts the
+// live stream.
 
 function escapeHtml(s){
   return (s || "").replace(/[&<>"']/g, function(c){
@@ -255,17 +332,53 @@ function escapeHtml(s){
   });
 }
 
+// BUG FIX: previously built '<a href="' + a.url + '" ...>' with the raw,
+// un-escaped URL. A title or url containing a stray '"' (some feeds don't
+// sanitize their own output) could break out of the attribute and inject
+// markup into the page. Every dynamic value in these templates — href
+// included — now goes through escapeHtml().
 function articleHtml(a){
   var badgeClass = a.category === 'RISK' ? 'badge crit' : 'badge';
   var search = ((a.title||'') + ' ' + (a.source||'') + ' ' + (a.country||'')).toLowerCase();
   var ts = (a.collected_at||'').slice(5,16);
-  return '<div class="article" data-search="' + escapeHtml(search) + '">' +
+  return '<div class="article" data-search="' + escapeHtml(search) + '" data-category="' + escapeHtml((a.category||'').toLowerCase()) + '" data-country="' + escapeHtml((a.country||'').toLowerCase()) + '">' +
     '<div class="ts mono">' + escapeHtml(ts) + '</div>' +
     '<div class="body">' +
-    '<a href="' + a.url + '" target="_blank">' + escapeHtml(a.title) + '</a>' +
+    '<a href="' + escapeHtml(a.url) + '" target="_blank" rel="noopener">' + escapeHtml(a.title) + '</a>' +
     '<div class="meta"><span class="' + badgeClass + '">' + escapeHtml(a.category) + '</span>' +
     '<span>' + escapeHtml(a.source) + '</span><span class="sep">/</span><span>' + escapeHtml(a.country) + '</span>' +
     '</div></div></div>';
+}
+
+// ---- Volume chart: buckets whatever article list we currently have by
+// day (last 14 days). Recomputed on every refresh so it stays live
+// without a separate endpoint. ----
+function renderVolumeChart(articles){
+  var days = [];
+  var counts = {};
+  var now = new Date();
+  for (var i = 13; i >= 0; i--){
+    var d = new Date(now);
+    d.setDate(d.getDate() - i);
+    var key = d.toISOString().slice(0,10);
+    days.push(key);
+    counts[key] = 0;
+  }
+  articles.forEach(function(a){
+    var key = (a.collected_at || '').slice(0,10);
+    if (key in counts) counts[key]++;
+  });
+  var max = Math.max.apply(null, days.map(function(k){ return counts[k]; }).concat([1]));
+  var todayKey = now.toISOString().slice(0,10);
+  var html = days.map(function(k){
+    var pct = Math.max(2, Math.round((counts[k] / max) * 100));
+    var label = k.slice(5).replace('-', '/');
+    var isToday = k === todayKey ? ' today' : '';
+    return '<div class="bar-col" title="' + counts[k] + ' on ' + k + '">' +
+      '<div class="bar' + isToday + '" style="height:' + pct + '%"></div>' +
+      '<div class="bar-label">' + label + '</div></div>';
+  }).join('');
+  document.getElementById('volumeChart').innerHTML = html;
 }
 
 function refreshNews(){
@@ -273,7 +386,7 @@ function refreshNews(){
     var list = document.getElementById('articleList');
     list.innerHTML = data.articles.length
       ? data.articles.map(articleHtml).join('')
-      : '<div class="empty">No BRICS-relevant articles yet.</div>';
+      : '<div class="empty" id="noArticlesMsg">Nothing collected yet. The next collect cycle will populate this — check the "Sources in use" panel if it\'s been a while.</div>';
 
     var crit = document.getElementById('criticalList');
     crit.innerHTML = data.critical.length
@@ -285,19 +398,53 @@ function refreshNews(){
     document.getElementById('totalCount').textContent = data.total;
     document.getElementById('refreshedTime').textContent = data.refreshed;
 
-    filterArticles(); // re-apply any active search filter to the new list
+    renderVolumeChart(data.articles);
+    filterArticles(); // re-apply any active search/category/country filter
   }).catch(function(e){ console.error('refresh failed', e); });
 }
 
+// BUG FIX: previously only matched the free-text search box against
+// data-search, ignoring category/country dropdowns entirely (they didn't
+// exist before). Now all three conditions must pass for a row to show,
+// and an explicit "no matches" message appears instead of a silently
+// empty list when filters are too narrow.
 function filterArticles(){
   var q = document.getElementById('filterBox').value.toLowerCase();
-  document.querySelectorAll('#articleList .article').forEach(function(el){
-    el.style.display = el.dataset.search.indexOf(q) > -1 ? '' : 'none';
+  var cat = document.getElementById('categoryFilter').value;
+  var country = document.getElementById('countryFilter').value;
+  var visibleCount = 0;
+  var rows = document.querySelectorAll('#articleList .article');
+  rows.forEach(function(el){
+    var matchesText = !q || el.dataset.search.indexOf(q) > -1;
+    var matchesCat = !cat || el.dataset.category === cat;
+    var matchesCountry = !country || el.dataset.country === country;
+    var show = matchesText && matchesCat && matchesCountry;
+    el.style.display = show ? '' : 'none';
+    if (show) visibleCount++;
   });
+  var noMatches = document.getElementById('noMatchesMsg');
+  if (noMatches) noMatches.style.display = (rows.length > 0 && visibleCount === 0) ? '' : 'none';
 }
 
 // Poll for new news every 60s. Video iframes above are untouched by this.
 setInterval(refreshNews, 60000);
+
+// ---- Theme toggle: persisted in localStorage, defaults to dark (the
+// site's original/native look) so returning visitors and first-time
+// visitors see the same thing unless they've explicitly chosen light. ----
+(function(){
+  var saved = localStorage.getItem('brics_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeToggle').textContent = saved === 'dark' ? '☾ Dark' : '☀ Light';
+})();
+
+function toggleTheme(){
+  var current = document.documentElement.getAttribute('data-theme');
+  var next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('brics_theme', next);
+  document.getElementById('themeToggle').textContent = next === 'dark' ? '☾ Dark' : '☀ Light';
+}
 
 // ---- Live stream add/remove (dashboard-only, no code/config editing) ----
 // Remembers the dashboard key in this browser so it doesn't need retyping.
@@ -315,9 +462,9 @@ function streamMsg(text, isError){
 function videoBoxHtml(s){
   return '<div class="video-box" data-name="' + escapeHtml(s.name) + '">' +
     '<button class="rm" title="Remove stream" data-remove-stream="' + escapeHtml(s.name) + '">✕</button>' +
-    '<iframe src="' + s.embed_url + '" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>' +
+    '<iframe src="' + escapeHtml(s.embed_url) + '" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>' +
     '<div class="vname">' + escapeHtml(s.name) +
-    ' <a href="' + s.watch_url + '" target="_blank" style="font-weight:400;color:#888;">↗ open</a></div></div>';
+    ' <a href="' + escapeHtml(s.watch_url) + '" target="_blank" style="font-weight:400;color:var(--dim);">↗ open</a></div></div>';
 }
 
 function submitNewStream(){
@@ -337,7 +484,7 @@ function submitNewStream(){
   }).then(function(r){ return r.json().then(function(data){ return {ok: r.ok, data: data}; }); })
     .then(function(res){
       if (!res.ok){ streamMsg(res.data.error || 'Could not add stream.', true); return; }
-      streamMsg('Added "' + res.data.stream.name + '". Reload isn\'t needed for it to persist — it\'s saved.', false);
+      streamMsg('Added "' + res.data.stream.name + '". No reload needed — it\'s saved.', false);
       var grid = document.getElementById('videoGrid');
       var empty = document.getElementById('noStreamsMsg');
       if (empty) empty.remove();
@@ -374,6 +521,9 @@ document.getElementById('videoGrid').addEventListener('click', function(e){
   if (!btn) return;
   removeStream(btn.getAttribute('data-remove-stream'));
 });
+
+// Initial chart render from the server-rendered article list.
+renderVolumeChart({{ articles|tojson }});
 </script>
 </body>
 </html>
