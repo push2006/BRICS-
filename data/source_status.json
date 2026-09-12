@@ -1,0 +1,146 @@
+{
+  "The Hindu": {
+    "status": "ok",
+    "count": 60,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "NDTV Top Stories": {
+    "status": "ok",
+    "count": 20,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Times of India": {
+    "status": "ok",
+    "count": 19,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Hindustan Times": {
+    "status": "ok",
+    "count": 60,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "TASS": {
+    "status": "ok",
+    "count": 60,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "RIA Novosti": {
+    "status": "ok",
+    "count": 20,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Xinhua": {
+    "status": "ok",
+    "count": 20,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "CCTV": {
+    "status": "error",
+    "count": 0,
+    "message": "<unknown>:34:10: not well-formed (invalid token)",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "News24": {
+    "status": "ok",
+    "count": 20,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "SABC News": {
+    "status": "ok",
+    "count": 10,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "G1/Globo": {
+    "status": "ok",
+    "count": 0,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Agencia Brasil": {
+    "status": "ok",
+    "count": 10,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Daily News Egypt": {
+    "status": "ok",
+    "count": 10,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Ahram Online": {
+    "status": "ok",
+    "count": 0,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Fana Broadcasting": {
+    "status": "ok",
+    "count": 10,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Ethiopian News Agency": {
+    "status": "error",
+    "count": 0,
+    "message": "<unknown>:1105:2: mismatched tag",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Antara News": {
+    "status": "ok",
+    "count": 50,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Jakarta Post": {
+    "status": "ok",
+    "count": 0,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "IRNA": {
+    "status": "ok",
+    "count": 30,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Press TV": {
+    "status": "ok",
+    "count": 0,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "WAM": {
+    "status": "error",
+    "count": 0,
+    "message": "<unknown>:73:2040: mismatched tag",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "The National": {
+    "status": "ok",
+    "count": 0,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Arab News": {
+    "status": "ok",
+    "count": 0,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  },
+  "Saudi Gazette": {
+    "status": "ok",
+    "count": 50,
+    "message": "",
+    "checked_at": "2026-09-12T06:37:07.723811"
+  }
+}
