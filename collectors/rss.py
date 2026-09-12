@@ -183,21 +183,24 @@ def fetch_all(tiers=(1, 2)):
     socket.setdefaulttimeout(_FETCH_TIMEOUT_SECONDS)
     try:
         with ThreadPoolExecutor(max_workers=min(_MAX_CONCURRENT_FETCHES, len(to_fetch))) as pool:
-            future_to_src = {pool.submit(_fetch_feed, src["url"]): src for src in to_fetch}
-            # Collect in submission order (not completion order) so console
-            # output/status stays stable and easy to read run-to-run.
+            # Keyed by list index rather than source name — two sources
+            # sharing a name (a copy-paste in sources.yaml, say) would
+            # otherwise silently collide and one feed's results would
+            # clobber the other's in `results`.
+            future_to_idx = {pool.submit(_fetch_feed, src["url"]): i for i, src in enumerate(to_fetch)}
             results = {}
-            for future in as_completed(future_to_src):
-                src = future_to_src[future]
+            for future in as_completed(future_to_idx):
+                idx = future_to_idx[future]
+                src = to_fetch[idx]
                 try:
-                    results[src["name"]] = future.result()
+                    results[idx] = future.result()
                 except Exception as e:
                     print(f"[rss] {src['name']}: FAILED ({e})")
                     _record_status(src["name"], "error", 0, str(e))
-                    results[src["name"]] = None
+                    results[idx] = None
 
-            for src in to_fetch:
-                feed = results.get(src["name"])
+            for idx, src in enumerate(to_fetch):
+                feed = results.get(idx)
                 if feed is None:
                     continue
                 articles.extend(_process_feed(src, feed))
