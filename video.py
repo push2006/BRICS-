@@ -43,27 +43,35 @@ def _read_raw_streams():
     return data.get("streams", []) or []
 
 
+def _enrich_stream(s):
+    """Inject embed_url / watch_url (and normalize video_id) onto a raw
+    stream dict. Mutates and returns the same dict. Safe for missing keys.
+    Used by load_streams() and by add_stream() so the dashboard API always
+    returns a fully playable object (prevents iframe src=undefined)."""
+    stype = s.get("type")
+    if stype == "channel":
+        channel_id = s.get("channel_id", "")
+        if channel_id:
+            s["embed_url"] = f"https://www.youtube.com/embed/live_stream?channel={channel_id}"
+            s["watch_url"] = f"https://www.youtube.com/channel/{channel_id}/live"
+    elif stype == "video":
+        vid = extract_video_id(s.get("video_id", ""))
+        s["video_id"] = vid  # normalize in case a full URL was pasted
+        if vid:
+            s["embed_url"] = f"https://www.youtube.com/embed/{vid}"
+            s["watch_url"] = f"https://www.youtube.com/watch?v={vid}"
+    # else: unrecognized/missing type — leave without embed rather than crash
+    return s
+
+
 def load_streams():
     streams = _read_raw_streams()
     for s in streams:
         # BUG FIX: previously `s["type"]` — a hand-edited or malformed entry
         # missing the "type" key raised KeyError and took down /dashboard,
         # /api/streams, AND the email digest (which also calls this) all at
-        # once. `.get()` skips the entry instead of crashing the request.
-        stype = s.get("type")
-        if stype == "channel":
-            channel_id = s.get("channel_id", "")
-            if not channel_id:
-                continue
-            s["embed_url"] = f"https://www.youtube.com/embed/live_stream?channel={channel_id}"
-            s["watch_url"] = f"https://www.youtube.com/channel/{channel_id}/live"
-        elif stype == "video":
-            vid = extract_video_id(s.get("video_id", ""))
-            s["video_id"] = vid  # normalize in case a full URL was pasted
-            s["embed_url"] = f"https://www.youtube.com/embed/{vid}"
-            s["watch_url"] = f"https://www.youtube.com/watch?v={vid}"
-        # else: unrecognized/missing type — leave it out of embed rendering
-        # rather than crash; it'll just show without a playable embed.
+        # once. `.get()` + _enrich_stream skips the entry instead of crashing.
+        _enrich_stream(s)
     return streams
 
 
@@ -85,7 +93,8 @@ def _write_raw_streams(streams):
 
 def add_stream(name, country, link):
     """Add a new video stream from a pasted YouTube link (or bare ID).
-    Returns the normalized stream dict that was added."""
+    Returns the fully enriched stream dict (with embed_url/watch_url) so
+    the dashboard can insert a working iframe without a page reload."""
     name = (name or "").strip()
     country = (country or "Custom").strip() or "Custom"
     vid = extract_video_id(link)
@@ -102,7 +111,8 @@ def add_stream(name, country, link):
         new_stream = {"name": name, "country": country, "type": "video", "video_id": vid}
         streams.append(new_stream)
         _write_raw_streams(streams)
-    return new_stream
+    # Return enriched copy so API clients (dashboard JS) get playable URLs
+    return _enrich_stream(dict(new_stream))
 
 
 def remove_stream(name):
