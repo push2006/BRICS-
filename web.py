@@ -176,20 +176,56 @@ def export_csv():
     """BUG FIX: previously built the CSV by hand-concatenating strings and
     only quoted `title` — any comma in `source`, `published`, etc. silently
     shifted every column after it. Using the stdlib `csv` module quotes and
-    escapes every field correctly, including embedded quotes/newlines."""
+    escapes every field correctly, including embedded quotes/newlines.
+
+    Optional query params let the dashboard export exactly what's currently
+    on screen instead of always dumping everything:
+      ?category=TRADE     — case-insensitive exact match on category
+      ?country=India       — case-insensitive exact match on country
+      ?q=some+text          — substring match against title/source/country
+      ?critical_only=1      — only rows classifier.is_critical() flags
+      ?limit=500             — cap row count fetched from the store (default 1000)
+    """
     store = get_store()
-    rows = store.recent(1000)
+    try:
+        limit = min(int(request.args.get("limit", 1000)), 5000)
+    except ValueError:
+        limit = 1000
+    rows = store.recent(limit)
+
+    category = (request.args.get("category") or "").strip().lower()
+    country = (request.args.get("country") or "").strip().lower()
+    q = (request.args.get("q") or "").strip().lower()
+    critical_only = request.args.get("critical_only") in ("1", "true", "yes")
+
+    if category:
+        rows = [r for r in rows if (r.get("category") or "").lower() == category]
+    if country:
+        rows = [r for r in rows if (r.get("country") or "").lower() == country]
+    if q:
+        rows = [r for r in rows if q in ((r.get("title") or "") + " " +
+                                          (r.get("source") or "") + " " +
+                                          (r.get("country") or "")).lower()]
+    if critical_only:
+        rows = [r for r in rows if is_critical(r)]
+
     buf = io.StringIO()
     writer = csv.writer(buf)
-    writer.writerow(["title", "url", "source", "country", "category", "published", "collected_at"])
+    writer.writerow(["title", "url", "source", "country", "category",
+                      "published", "collected_at", "corroborated_by"])
     for r in rows:
+        corroborated = r.get("corroborated_by") or []
         writer.writerow([
             r.get("title", ""), r.get("url", ""), r.get("source", ""),
             r.get("country", ""), r.get("category", ""), r.get("published", ""),
             r.get("collected_at", ""),
+            "; ".join(corroborated) if isinstance(corroborated, list) else corroborated,
         ])
+
+    stamp = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    filename = "brics_articles_" + stamp + ".csv"
     return Response(buf.getvalue(), mimetype="text/csv",
-                     headers={"Content-Disposition": "attachment;filename=brics_articles.csv"})
+                     headers={"Content-Disposition": f"attachment;filename={filename}"})
 
 
 @app.post("/trigger-collect")
